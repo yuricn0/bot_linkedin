@@ -62,11 +62,8 @@ def automatizar_convites_linkedin(cargo, mensagem):
         sleep((randint(4,8)))
     except:
         print('Não foi possivel fazer a automação, reinicie o sistema.')
-
-    existe_proxima_pagina = True
-    qtd_convites = 0
-
-    while existe_proxima_pagina == True:
+    while True:   
+        qtd_convites = 0
         # Descer e subir a página
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         sleep(2)
@@ -105,9 +102,7 @@ def automatizar_convites_linkedin(cargo, mensagem):
                     sleep((randint(2,7)))
                     qtd_convites += 1 
                 else:
-                    print('Limite de convites atingidos.')
-                    driver.close()
-                    break        
+                    print('Limite de convites atingidos.')       
         # Verificar se o botão avançar está ativo
             if qtd_convites < 15:
                 try:
@@ -117,8 +112,9 @@ def automatizar_convites_linkedin(cargo, mensagem):
 
                 except Exception as error:
                     print(f'Acabou as pesquisas para {cargo}.')
-                    existe_proxima_pagina = False
                     driver.close()
+                    break
+        driver.close()
+        break
 
-
-            
+                
