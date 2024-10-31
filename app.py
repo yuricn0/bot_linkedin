@@ -37,31 +37,34 @@ def iniciar_driver():
     return driver, wait
 
 def automatizar_convites_linkedin(cargo, mensagem):
+    try:
+        driver, wait = iniciar_driver()
+        # Abrir o site do linkedin
 
-    driver, wait = iniciar_driver()
-    # Abrir o site do linkedin
+        driver.get('https://www.linkedin.com/login/pt?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
+        print('Faça o login, a automação iniciará em instantes.')
+        sleep(50)
 
-    driver.get('https://www.linkedin.com/login/pt?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
-    print('Faça o login, a automação iniciará em instantes.')
-    sleep(50)
+        # Encontrar e clicar campo de pesquisa
+        campo_pesquisar = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,"//input[@placeholder='Pesquisar']")))
+        campo_pesquisar.click()
+        sleep((randint(1,4)))
 
-    # Encontrar e clicar campo de pesquisa
-    campo_pesquisar = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,"//input[@placeholder='Pesquisar']")))
-    campo_pesquisar.click()
-    sleep((randint(1,4)))
+        # Input pro usuário colocar qual profissão e digitar enter
+        campo_pesquisar.send_keys(cargo)
+        sleep((randint(1,3)))
+        campo_pesquisar.send_keys(Keys.ENTER)
+        sleep((randint(10,15)))
 
-    # Input pro usuário colocar qual profissão e digitar enter
-    campo_pesquisar.send_keys(cargo)
-    sleep((randint(1,3)))
-    campo_pesquisar.send_keys(Keys.ENTER)
-    sleep((randint(10,15)))
-
-    # Marcar no campo 'Pessoas'
-    campo_pessoas = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,'//nav//div//ul//li[3]//button')))
-    campo_pessoas.click()
-    sleep((randint(4,8)))
+        # Marcar no campo 'Pessoas'
+        campo_pessoas = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,'//nav//div//ul//li[3]//button')))
+        campo_pessoas.click()
+        sleep((randint(4,8)))
+    except:
+        print('Não foi possivel fazer a automação, reinicie o sistema.')
 
     existe_proxima_pagina = True
+    qtd_convites = 0
 
     while existe_proxima_pagina == True:
         # Descer e subir a página
@@ -69,47 +72,53 @@ def automatizar_convites_linkedin(cargo, mensagem):
         sleep(2)
         driver.execute_script("window.scrollTo(0, document.body.scrollTop);")
         sleep(2)
-
+        if qtd_convites < 15:
         # Verificar se tem botões 'Conectar'?
-        botões_conectar = wait.until(condicao_esperada.visibility_of_all_elements_located((By.XPATH,"//button//span[text()='Conectar']")))
-        for botao in botões_conectar:
-        
-            # Clicar no 1° campo 'Conectar'
-            botao.click()
-            sleep(randint(5,10))
+            botões_conectar = wait.until(condicao_esperada.visibility_of_all_elements_located((By.XPATH,"//button//span[text()='Conectar']")))
+            for botao in botões_conectar:
+                if qtd_convites < 15:
+                    # Clicar no 1° campo 'Conectar'
+                    botao.click()
+                    sleep(randint(5,10))
 
-            # Extrair o nome
-            nome_contato = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,'//p//span//strong'))).text
-            primeiro_nome = nome_contato.split()[0]
-            sleep((randint(1,3)))
+                    # Extrair o nome
+                    nome_contato = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,'//p//span//strong'))).text
+                    primeiro_nome = nome_contato.split()[0]
+                    sleep((randint(1,3)))
 
-            # Encontrar e clicar no campo adicionar nota
-            botao_adicionar_nota = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,"//button[@aria-label='Adicionar nota']")))
-            botao_adicionar_nota.click()
-            sleep((randint(1,3)))
+                    # Encontrar e clicar no campo adicionar nota
+                    botao_adicionar_nota = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,"//button[@aria-label='Adicionar nota']")))
+                    botao_adicionar_nota.click()
+                    sleep((randint(1,3)))
 
-            # Encontrar e digitar a mensagem personalizada com o nome extraido
-            mensagem_personalizada = f'Oii, {primeiro_nome}!{os.linesep}{mensagem}'
+                    # Encontrar e digitar a mensagem personalizada com o nome extraido
+                    mensagem_personalizada = f'Oii, {primeiro_nome}!{os.linesep}{mensagem}'
 
-            campo_mensagem = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,"//textarea[@name='message']")))
-            campo_mensagem.click()
-            campo_mensagem.send_keys(mensagem_personalizada)
-            sleep((randint(1,5)))
+                    campo_mensagem = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,"//textarea[@name='message']")))
+                    campo_mensagem.click()
+                    campo_mensagem.send_keys(mensagem_personalizada)
+                    sleep((randint(1,5)))
 
-            # Encontrar botão 'Enviar' e clicar
-            botao_enviar_convite = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,'//button[@aria-label="Enviar convite"]')))
-            botao_enviar_convite.click()
-            sleep((randint(2,7)))
-
+                    # Encontrar botão 'Enviar' e clicar
+                    botao_enviar_convite = wait.until(condicao_esperada.visibility_of_element_located((By.XPATH,'//button[@aria-label="Enviar convite"]')))
+                    botao_enviar_convite.click()
+                    sleep((randint(2,7)))
+                    qtd_convites += 1 
+                else:
+                    print('Limite de convites atingidos.')
+                    driver.close()
+                    break        
         # Verificar se o botão avançar está ativo
-        try:
-            botao_avancar = wait.until(condicao_esperada.element_to_be_clickable((By.XPATH,'//button[@aria-label="Avançar"]')))
-            botao_avancar.click()
-            sleep((randint(1,5)))
+            if qtd_convites < 15:
+                try:
+                    botao_avancar = wait.until(condicao_esperada.element_to_be_clickable((By.XPATH,'//button[@aria-label="Avançar"]')))
+                    botao_avancar.click()
+                    sleep((randint(1,5)))
 
-        except Exception as error:
-            print(f'Acabou as pesquisas para {cargo}.')
-            existe_proxima_pagina = False
-        
+                except Exception as error:
+                    print(f'Acabou as pesquisas para {cargo}.')
+                    existe_proxima_pagina = False
+                    driver.close()
+
 
             
