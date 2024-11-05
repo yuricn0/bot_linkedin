@@ -2,14 +2,15 @@ import PySimpleGUI as sg
 from threading import Thread
 from app import automatizar_convites_linkedin
 
+
 sg.theme('Reddit')
 
 layout = [
 [sg.Text('Pesquisar profissão:'), sg.Input(key='cargo', size=(20,0))],
 [sg.Text('Mensagem no convite:')],
-[sg.Multiline(key='mensagem', size=(48, 7))],
+[sg.Multiline(key='mensagem', size=(48, 5))],
 [sg.Text('Avisos:')],
-[sg.Output(size=(48,5))],
+[sg.Output(size=(48,10))],
 [sg.Button('Enviar', key='botao_enviar')],
 ]
 
